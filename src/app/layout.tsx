@@ -2,6 +2,8 @@ import "@/styles/globals.css";
 
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "@/components/ui/toaster";
+import QueryProvider from "@/lib/Providers";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,7 +24,10 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`dark font-sans ${inter.variable}`}>{children}</body>
+        <body className={`dark font-sans ${inter.variable}`}>
+          <QueryProvider>{children}</QueryProvider>
+          <Toaster />
+        </body>
       </html>
     </ClerkProvider>
   );
