@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { toast } from "@/components/ui/use-toast";
+import { Trash2 } from "lucide-react";
 import type { Playlist, Mix } from "@/lib/types";
 import { queueMix } from "@/server/actions";
 import PlaylistSelect from "./PlaylistSelect";
@@ -37,7 +38,7 @@ const FormSchema = z.object({
 });
 
 const Mix = ({ data }: MixProps) => {
-  const [pickedLists, setPickedLists] = useState([]);
+  const [pickedLists, setPickedLists] = useState<Playlist[]>([]);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -101,7 +102,7 @@ const Mix = ({ data }: MixProps) => {
                     </CardHeader>
                   </Card>
 
-                  <div className="basis-1/4">
+                  <div className="basis-1/5">
                     <FormField
                       control={form.control}
                       name={`playlistRatios.${item.id}%${item.tracks["total"]}`}
@@ -119,6 +120,22 @@ const Mix = ({ data }: MixProps) => {
                         </FormItem>
                       )}
                     />
+                  </div>
+
+                  <div className="basis-[5%] content-center">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() =>
+                        setPickedLists(
+                          pickedLists.filter(
+                            (playlist) => playlist?.id !== item.id,
+                          ),
+                        )
+                      }
+                    >
+                      <Trash2 />
+                    </Button>
                   </div>
                 </div>
               ))}
