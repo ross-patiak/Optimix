@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { SignInButton, SignOutButton } from "@clerk/nextjs";
 import type { Playlist } from "@/lib/types";
 import { getUser, getUserPlaylists } from "@/server/actions";
