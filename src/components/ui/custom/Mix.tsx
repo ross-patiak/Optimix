@@ -33,6 +33,7 @@ type MixProps = {
 
 const FormSchema = z.object({
   playlistRatios: z.record(z.string(), z.string()),
+  queueSize: z.string(),
 });
 
 const Mix = ({ data }: MixProps) => {
@@ -40,6 +41,9 @@ const Mix = ({ data }: MixProps) => {
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      queueSize: "10",
+    },
   });
 
   const onSubmit = async (mixData: z.infer<typeof FormSchema>) => {
@@ -52,7 +56,7 @@ const Mix = ({ data }: MixProps) => {
   };
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-5">
       <PlaylistSelect
         data={data}
         pickedLists={pickedLists as Playlist[]}
@@ -65,6 +69,29 @@ const Mix = ({ data }: MixProps) => {
               onSubmit={form.handleSubmit(onSubmit)}
               className="w-2/3 space-y-6"
             >
+              <FormField
+                control={form.control}
+                name="queueSize"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Queue Size (keep it between 1-20 for now; default: 10)
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        defaultValue={"10"}
+                        inputMode="numeric"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="text-lg font-bold">
+                Playlist Weights (ensure %'s sum up to 100) 👇
+              </div>
               {pickedLists?.map((item: Playlist) => (
                 <div className="flex" key={item.id}>
                   <Card className="grow basis-3/4">

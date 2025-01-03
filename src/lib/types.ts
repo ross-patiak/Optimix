@@ -6,4 +6,5 @@ export type Playlist = {
 
 export type Mix = {
   playlistRatios: Record<string, string>;
+  queueSize: string;
 };
