@@ -123,7 +123,7 @@ const Mix = ({ data }: MixProps) => {
                 <div className="flex" key={item.id}>
                   <Card className="grow basis-3/4">
                     <CardHeader>
-                      <CardTitle>{item.id}</CardTitle>
+                      <CardTitle>{`id: ${item.id}`}</CardTitle>
                       <CardDescription>{item.name}</CardDescription>
                     </CardHeader>
                   </Card>
@@ -152,13 +152,17 @@ const Mix = ({ data }: MixProps) => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() =>
+                      onClick={() => {
                         setPickedLists(
                           pickedLists.filter(
                             (playlist) => playlist?.id !== item.id,
                           ),
-                        )
-                      }
+                        );
+
+                        form.unregister(
+                          `playlistRatios.${item.id}%${item.tracks["total"]}`,
+                        );
+                      }}
                     >
                       <Trash2 />
                     </Button>
