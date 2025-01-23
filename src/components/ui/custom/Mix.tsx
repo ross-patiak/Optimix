@@ -22,7 +22,7 @@ import { Trash2 } from "lucide-react";
 import type { Playlist, Mix } from "@/lib/types";
 import { queueMix } from "@/server/actions";
 import PlaylistSelect from "./PlaylistSelect";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -33,8 +33,11 @@ type MixProps = {
 };
 
 const FormSchema = z.object({
-  playlistRatios: z.record(z.string(), z.string()),
-  queueSize: z.string(),
+  playlistRatios: z.record(
+    z.string(),
+    z.string().regex(/^\d+(\.\d+)?$/, { message: "Must be a number" }),
+  ),
+  queueSize: z.string().regex(/^\d{1,2}$/, { message: "Must be a number" }),
 });
 
 const Mix = ({ data }: MixProps) => {
@@ -43,17 +46,44 @@ const Mix = ({ data }: MixProps) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      queueSize: "10",
+      queueSize: "10", // Default value for queueSize
     },
   });
 
-  const onSubmit = async (mixData: z.infer<typeof FormSchema>) => {
-    await queueMix(mixData);
+  useEffect(() => {
+    //dynamically set the default values for playlistRatios
+    if (pickedLists) {
+      pickedLists.forEach((item: Playlist) => {
+        const ratio = Number.isInteger(100 / pickedLists.length)
+          ? (100 / pickedLists.length).toString()
+          : (100 / pickedLists.length).toFixed(2);
+        form.setValue(
+          `playlistRatios.${item.id}%${item.tracks["total"]}`,
+          ratio,
+        );
+      });
+    }
+  }, [pickedLists, form.setValue]);
 
-    toast({
-      title: "Success:",
-      description: JSON.stringify(mixData.playlistRatios, null, 2),
-    });
+  const onSubmit = async (mixData: z.infer<typeof FormSchema>) => {
+    if (mixData.playlistRatios) {
+      const ratios = Object.values(mixData.playlistRatios).map(Number);
+      const sum = ratios.reduce((a, b) => a + b);
+      if (Math.round(sum) !== 100) {
+        toast({
+          title: "Error:",
+          description: "Playlist ratios must sum up to 100",
+        });
+        return;
+      } else {
+        await queueMix(mixData);
+
+        toast({
+          title: "Success:",
+          description: JSON.stringify(mixData.playlistRatios, null, 2),
+        });
+      }
+    }
   };
 
   return (
@@ -79,11 +109,7 @@ const Mix = ({ data }: MixProps) => {
                       Queue Size (keep it between 1-20 for now; default: 10)
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        defaultValue={"10"}
-                        inputMode="numeric"
-                      />
+                      <Input {...field} inputMode="numeric" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -111,9 +137,9 @@ const Mix = ({ data }: MixProps) => {
                           <FormLabel>%</FormLabel>
                           <FormControl>
                             <Input
-                              defaultValue={"0"}
                               inputMode="numeric"
                               {...field}
+                              defaultValue={`${form.getValues(`playlistRatios.${item.id}%${item.tracks["total"]}`)}`}
                             />
                           </FormControl>
                           <FormMessage />
