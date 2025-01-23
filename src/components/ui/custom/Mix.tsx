@@ -76,12 +76,20 @@ const Mix = ({ data }: MixProps) => {
         });
         return;
       } else {
-        await queueMix(mixData);
+        const queueResponse = await queueMix(mixData);
 
-        toast({
-          title: "Success:",
-          description: JSON.stringify(mixData.playlistRatios, null, 2),
-        });
+        if (queueResponse === 404) {
+          toast({
+            title: "Error:",
+            description:
+              "No active device found. Please open Spotify and temporarily play a song.",
+          });
+        } else {
+          toast({
+            title: "Success:",
+            description: `${mixData.queueSize} songs queued.`,
+          });
+        }
       }
     }
   };

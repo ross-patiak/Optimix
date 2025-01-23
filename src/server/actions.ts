@@ -45,30 +45,10 @@ export const getUserPlaylists = async ({ userId }: { userId: string }) => {
   }
 };
 
-export const queueMix = async (mix: Mix) => {
-  const user = await currentUser();
-
-  if (user != null) {
-    const clerkResponse = await clerkClient.users.getUserOauthAccessToken(
-      user.id,
-      "oauth_spotify",
-    );
-
-    const accessToken = clerkResponse.data[0]?.token;
-
-    const queueSize = Number(mix.queueSize); //ideally this would be a user input
-
-    //queue a single song weighted randomly queueSize times
-    for (let i = 0; i < queueSize; i++) {
-      await queueMixHelper(mix.playlistRatios, accessToken as string);
-    }
-  }
-};
-
 const queueMixHelper = async (
   playlists: Record<string, string>,
   accessToken: string,
-) => {
+): Promise<number> => {
   const random = Math.random();
   let cumulativeWeights = 0;
 
@@ -113,13 +93,13 @@ const queueMixHelper = async (
             );
 
             if (!response.ok) {
-              console.log("Failed to queue track");
+              return response.status;
             }
           }
           // Continue processing the data...
         } else {
           // Handle the case where the timeout expired
-          console.log("Timeout expired");
+          console.log("Timeout expired or spotify response is undefined");
         }
       } catch (err) {
         console.log("Rejected:", err);
@@ -128,4 +108,37 @@ const queueMixHelper = async (
       break;
     }
   } //end of for loop
+
+  return 200;
+};
+
+export const queueMix = async (mix: Mix): Promise<number> => {
+  const user = await currentUser();
+
+  if (user != null) {
+    const clerkResponse = await clerkClient.users.getUserOauthAccessToken(
+      user.id,
+      "oauth_spotify",
+    );
+
+    const accessToken = clerkResponse.data[0]?.token;
+
+    const queueSize = Number(mix.queueSize); //ideally this would be a user input
+
+    //queue a single song weighted randomly queueSize times
+    for (let i = 0; i < queueSize; i++) {
+      const queueMixResponse = await queueMixHelper(
+        mix.playlistRatios,
+        accessToken as string,
+      );
+
+      if (queueMixResponse !== 200) {
+        return queueMixResponse;
+      }
+    }
+
+    return 200;
+  }
+
+  return 404;
 };

@@ -1,4 +1,10 @@
-import { SignInButton, SignOutButton } from "@clerk/nextjs";
+import {
+  SignInButton,
+  SignOutButton,
+  SignedIn,
+  SignedOut,
+} from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
 import type { Playlist } from "@/lib/types";
 import { getUser, getUserPlaylists } from "@/server/actions";
 import Mix from "@/components/ui/custom/Mix";
@@ -10,9 +16,20 @@ export default async function HomePage() {
 
   return (
     <main className="container">
-      {user != null ? <div>Hi {user?.firstName}</div> : null}
-      <SignInButton>Login</SignInButton>
-      <SignOutButton>Sign out</SignOutButton>
+      <SignedOut>
+        <SignInButton>
+          <Button>Sign In</Button>
+        </SignInButton>
+      </SignedOut>
+
+      <SignedIn>
+        {user != null ? <div>Hi {user?.firstName}</div> : null}
+
+        <SignOutButton>
+          <Button variant="secondary">Sign out</Button>
+        </SignOutButton>
+      </SignedIn>
+
       {playlists && <Mix data={playlists?.items as Playlist[]} />}
     </main>
   );
