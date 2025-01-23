@@ -8,6 +8,13 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Form,
   FormControl,
   FormField,
@@ -37,7 +44,7 @@ const FormSchema = z.object({
     z.string(),
     z.string().regex(/^\d+(\.\d+)?$/, { message: "Must be a number" }),
   ),
-  queueSize: z.string().regex(/^\d{1,2}$/, { message: "Must be a number" }),
+  queueSize: z.string(),
 });
 
 const Mix = ({ data }: MixProps) => {
@@ -113,12 +120,23 @@ const Mix = ({ data }: MixProps) => {
                 name="queueSize"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      Queue Size (keep it between 1-20 for now; default: 10)
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} inputMode="numeric" />
-                    </FormControl>
+                    <FormLabel>Queue Size</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a verified email to display" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="5">5</SelectItem>
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="15">15</SelectItem>
+                        <SelectItem value="20">20</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
