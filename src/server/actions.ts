@@ -15,18 +15,18 @@ export const getUserPlaylists = async ({ userId }: { userId: string }) => {
     );
 
     const accessToken = clerkResponse.data[0]?.token;
-    const controller = new AbortController();
     let data: any;
 
     try {
-      const spotifyResponse = await Promise.race([
-        fetch(`https://api.spotify.com/v1/me/playlists`, {
+      const spotifyResponse = await fetch(
+        `https://api.spotify.com/v1/me/playlists`,
+        {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
-        }),
-        new Promise((_, reject) => setTimeout(reject, 4000)),
-      ]);
+          signal: AbortSignal.timeout(4000),
+        },
+      );
 
       // Check if the fetch request resolved before the timeout
       if (spotifyResponse instanceof Response) {
@@ -39,7 +39,6 @@ export const getUserPlaylists = async ({ userId }: { userId: string }) => {
       }
     } catch (err) {
       console.log("Rejected:", err);
-      controller.abort();
     }
 
     return data;
@@ -83,21 +82,18 @@ const queueMixHelper = async (
       //fetch random song from playlist
       const randomIndex = ~~(Math.random() * Number(totalTracks));
 
-      const controller = new AbortController();
       let data: any;
 
       try {
-        const spotifyResponse = await Promise.race([
-          fetch(
-            `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=1&offset=${randomIndex}`,
-            {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-              },
+        const spotifyResponse = await fetch(
+          `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=1&offset=${randomIndex}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
             },
-          ),
-          new Promise((_, reject) => setTimeout(reject, 4000)),
-        ]);
+            signal: AbortSignal.timeout(4000),
+          },
+        );
 
         // Check if the fetch request resolved before the timeout
         if (spotifyResponse instanceof Response) {
@@ -112,6 +108,7 @@ const queueMixHelper = async (
               {
                 headers: { Authorization: `Bearer ${accessToken}` },
                 method: "POST",
+                signal: AbortSignal.timeout(4000),
               },
             );
 
@@ -126,7 +123,6 @@ const queueMixHelper = async (
         }
       } catch (err) {
         console.log("Rejected:", err);
-        controller.abort();
       }
 
       break;
