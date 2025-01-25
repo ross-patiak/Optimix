@@ -12,7 +12,7 @@ import Mix from "@/components/ui/custom/Mix";
 
 export default async function HomePage() {
   const user = await getUser();
-  const playlists = await getUserPlaylists({ userId: user?.id as string });
+  const playlists = await getUserPlaylists({ userId: user?.clerkId as string });
 
   return (
     <main className="container">
@@ -23,14 +23,16 @@ export default async function HomePage() {
       </SignedOut>
 
       <SignedIn>
-        {user != null ? <div>Hi {user?.firstName}</div> : null}
+        {user != null ? <div>Hi {user?.display_name} </div> : null}
 
         <SignOutButton>
           <Button variant="secondary">Sign out</Button>
         </SignOutButton>
       </SignedIn>
 
-      {playlists && <Mix data={playlists?.items as Playlist[]} />}
+      {playlists && (
+        <Mix data={playlists?.items as Playlist[]} userId={user?.id} />
+      )}
     </main>
   );
 }

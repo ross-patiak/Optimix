@@ -37,6 +37,7 @@ import { z } from "zod";
 
 type MixProps = {
   data: Playlist[];
+  userId: string;
 };
 
 const FormSchema = z.object({
@@ -47,7 +48,7 @@ const FormSchema = z.object({
   queueSize: z.string(),
 });
 
-const Mix = ({ data }: MixProps) => {
+const Mix = ({ data, userId }: MixProps) => {
   const [pickedLists, setPickedLists] = useState<Playlist[]>([]);
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -105,6 +106,7 @@ const Mix = ({ data }: MixProps) => {
     <div className="flex flex-col gap-5">
       <PlaylistSelect
         data={data}
+        userId={userId}
         pickedLists={pickedLists as Playlist[]}
         setPickedLists={setPickedLists}
       />

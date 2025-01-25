@@ -18,6 +18,7 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -27,6 +28,7 @@ import type { Playlist } from "@/lib/types";
 /* eslint-disable */
 type PlaylistSelectProps = {
   data: Playlist[];
+  userId: string;
   pickedLists?: Playlist[];
   setPickedLists?: any;
 };
@@ -37,6 +39,7 @@ const FormSchema = z.object({
 //data is needed to populate the select dropdown
 const PlaylistSelect = ({
   data,
+  userId,
   pickedLists,
   setPickedLists,
 }: PlaylistSelectProps) => {
@@ -89,18 +92,38 @@ const PlaylistSelect = ({
                 </FormControl>
                 <SelectContent>
                   <SelectGroup>
-                    {data?.map((item) => (
-                      <SelectItem
-                        key={item?.id}
-                        value={JSON.stringify({
-                          id: item?.id,
-                          name: item?.name,
-                          tracks: item?.tracks,
-                        })}
-                      >
-                        {item?.name}
-                      </SelectItem>
-                    ))}
+                    <SelectLabel>By you</SelectLabel>
+                    {data
+                      ?.filter((item) => item.owner.id === userId)
+                      .map((item) => (
+                        <SelectItem
+                          key={item?.id}
+                          value={JSON.stringify({
+                            id: item?.id,
+                            name: item?.name,
+                            tracks: item?.tracks,
+                          })}
+                        >
+                          {item?.name}
+                        </SelectItem>
+                      ))}
+                  </SelectGroup>
+                  <SelectGroup>
+                    <SelectLabel>NOT by you</SelectLabel>
+                    {data
+                      ?.filter((item) => item.owner.id !== userId)
+                      .map((item) => (
+                        <SelectItem
+                          key={item?.id}
+                          value={JSON.stringify({
+                            id: item?.id,
+                            name: item?.name,
+                            tracks: item?.tracks,
+                          })}
+                        >
+                          {item?.name}
+                        </SelectItem>
+                      ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>

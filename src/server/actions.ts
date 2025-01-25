@@ -1,12 +1,45 @@
 "use server";
-import { currentUser, clerkClient } from "@clerk/nextjs/server";
+import { currentUser, clerkClient, auth } from "@clerk/nextjs/server";
 import type { Mix } from "@/lib/types";
 /*eslint-disable*/
 export const getUser = async () => {
-  const user = await currentUser();
-  return user;
+  const { userId } = await auth();
+
+  if (userId != null) {
+    const clerkResponse = await clerkClient.users.getUserOauthAccessToken(
+      userId,
+      "oauth_spotify",
+    );
+
+    const accessToken = clerkResponse.data[0]?.token;
+    let data: any;
+
+    try {
+      const spotifyUser = await fetch(`https://api.spotify.com/v1/me/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        signal: AbortSignal.timeout(4000),
+      });
+
+      // Check if the fetch request resolved before the timeout
+      if (spotifyUser instanceof Response) {
+        //eslint-disable-next-line
+        data = await spotifyUser.json(); // or response.text(), response.blob(), etc.
+        // Continue processing the data...
+      } else {
+        // Handle the case where the timeout expired
+        console.log("Timeout expired");
+      }
+    } catch (err) {
+      console.log("Spotify user Rejected:", err);
+    }
+
+    return { ...data, clerkId: userId };
+  }
 };
 
+//what if the user has more than 50 playlists? what if user adds on spotify side (does not refresh page)?
 export const getUserPlaylists = async ({ userId }: { userId: string }) => {
   if (userId != null) {
     const clerkResponse = await clerkClient.users.getUserOauthAccessToken(
