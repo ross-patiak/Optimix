@@ -26,13 +26,13 @@ export default async function HomePage() {
         {user != null ? <div>Hi {user?.display_name} </div> : null}
 
         <SignOutButton>
-          <Button variant="secondary">Sign out</Button>
+          <Button variant="neutral">Sign out</Button>
         </SignOutButton>
-      </SignedIn>
 
-      {playlists && (
-        <Mix data={playlists?.items as Playlist[]} userId={user?.id} />
-      )}
+        {playlists && (
+          <Mix data={playlists?.items as Playlist[]} userId={user?.id} />
+        )}
+      </SignedIn>
     </main>
   );
 }

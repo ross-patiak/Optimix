@@ -4,48 +4,45 @@
 
 @layer base {
   :root {
-    --background: 225 10% 92%;
-    --foreground: 0 0% 0%;
-    --card: 225 10% 92%;
-    --card-foreground: 0 0% 0%;
-    --popover: 225 10% 92%;
-    --popover-foreground: 0 0% 0%;
-    --primary: 139 59% 45%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 223 14% 80%;
-    --secondary-foreground: 0 0% 0%;
-    --muted: 228 10% 20%;
-    --muted-foreground: 0 0% 70%;
-    --accent: 56 75% 42%;
-    --accent-foreground: 0 0% 0%;
-    --destructive: 0 85% 60%;
-    --destructive-foreground: 0 0% 0%;
-    --border: 228 10% 20%;
-    --input: 228 10% 20%;
-    --ring: 56 75% 40%;
-    --radius: 0.5rem;
+    --main: #ffdc58;
+    --overlay: rgba(
+      0,
+      0,
+      0,
+      0.8
+    ); /* background color overlay for alert dialogs, modals, etc. */
+
+    --bg: #fef2e8;
+    --bw: #fff; /* white and secondary black e.g. utility class variant would be: bg-[#fff] dark:bg-[#212121] */
+    --blank: #000; /* blank black and white */
+    --border: #000;
+    --text: #000;
+    --mtext: #000; /* text that is placed on background with main color e.g. text color of default button */
+    --ring: #000;
+    --ring-offset: #fff;
+
+    --border-radius: 8px;
+    --box-shadow-x: 3px;
+    --box-shadow-y: 3px;
+    --reverse-box-shadow-x: -3px;
+    --reverse-box-shadow-y: -3px;
+    --base-font-weight: 500;
+    --heading-font-weight: 700;
+
+    --shadow: var(--box-shadow-x) var(--box-shadow-y) 0px 0px var(--border);
   }
 
   .dark {
-    --background: 225 10% 8%;
-    --foreground: 0 0% 100%;
-    --card: 225 10% 8%;
-    --card-foreground: 0 0% 100%;
-    --popover: 225 10% 8%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 139 59% 55%;
-    --primary-foreground: 225 10% 8%;
-    --secondary: 223 14% 20%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 228 10% 80%;
-    --muted-foreground: 0 0% 100%;
-    --accent: 56 75% 58%;
-    --accent-foreground: 225 10% 8%;
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 10%;
-    --border: 225 10% 60%;
-    --input: 228 10% 80%;
-    --ring: 56 75% 60%;
+    --bg: #374151;
+    --bw: #212121;
+    --blank: #fff;
+    --border: #000;
+    --text: #e6e6e6;
+    --mtext: #000;
+    --ring: #fff;
+    --ring-offset: #000;
+
+    --shadow: var(--box-shadow-x) var(--box-shadow-y) 0px 0px var(--border);
   }
 }
 
@@ -54,6 +51,6 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-bg text-text;
   }
 }

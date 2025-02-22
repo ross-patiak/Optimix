@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { Trash2 } from "lucide-react";
 import type { Playlist, Mix } from "@/lib/types";
 import { queueMix } from "@/server/actions";
@@ -178,7 +178,7 @@ const Mix = ({ data, userId }: MixProps) => {
 
                   <div className="basis-[5%] content-center">
                     <Button
-                      variant="ghost"
+                      variant="default"
                       size="icon"
                       onClick={() => {
                         setPickedLists(

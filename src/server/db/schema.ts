@@ -18,8 +18,8 @@ import {
  */
 export const createTable = pgTableCreator((name) => `optimix_${name}`);
 
-export const posts = createTable(
-  "post",
+export const users = createTable(
+  "user",
   {
     id: serial("id").primaryKey(),
     name: varchar("name", { length: 256 }),
@@ -30,5 +30,5 @@ export const posts = createTable(
   },
   (example) => ({
     nameIndex: index("name_idx").on(example.name),
-  })
+  }),
 );
