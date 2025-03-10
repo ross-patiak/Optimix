@@ -27,12 +27,22 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { Trash2 } from "lucide-react";
 import type { Playlist, Mix } from "@/lib/types";
-import { queueMix } from "@/server/actions";
+import { queueMix, saveMix } from "@/server/actions";
 import PlaylistSelect from "./PlaylistSelect";
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 /* eslint-disable */
 
 type MixProps = {
@@ -46,10 +56,14 @@ const FormSchema = z.object({
     z.string().regex(/^\d+(\.\d+)?$/, { message: "Must be a number" }),
   ),
   queueSize: z.string(),
+  name: z.string().optional(),
 });
 
 const Mix = ({ data, userId }: MixProps) => {
   const [pickedLists, setPickedLists] = useState<Playlist[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [mixName, setMixName] = useState("");
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -99,6 +113,47 @@ const Mix = ({ data, userId }: MixProps) => {
           });
         }
       }
+    }
+  };
+
+  const handleSaveMix = async () => {
+    try {
+      setIsSaving(true);
+
+      const formValues = form.getValues();
+
+      if (!mixName.trim()) {
+        toast({
+          title: "Error",
+          description: "Please enter a name for your mix",
+          variant: "destructive",
+        });
+        setIsSaving(false);
+        return;
+      }
+
+      const mixToSave = {
+        ...formValues,
+        name: mixName,
+      };
+
+      await saveMix(mixToSave);
+
+      toast({
+        title: "Success",
+        description: "Mix saved successfully!",
+      });
+
+      setShowSaveDialog(false);
+    } catch (error) {
+      console.error("Error saving mix:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save mix. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -198,7 +253,44 @@ const Mix = ({ data, userId }: MixProps) => {
                 </div>
               ))}
 
-              <Button type="submit">Queue</Button>
+              <div className="flex gap-4">
+                <Button type="submit" className="w-full">
+                  Queue Mix
+                </Button>
+
+                <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+                  <DialogTrigger asChild>
+                    <Button type="button" variant="default" className="w-full">
+                      Save Mix
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Save Mix</DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
+                      <Label htmlFor="mix-name">Mix Name</Label>
+                      <Input
+                        id="mix-name"
+                        value={mixName}
+                        onChange={(e) => setMixName(e.target.value)}
+                        placeholder="My Awesome Mix"
+                      />
+                    </div>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button variant="default">Cancel</Button>
+                      </DialogClose>
+                      <Button
+                        onClick={handleSaveMix}
+                        disabled={isSaving || !mixName.trim()}
+                      >
+                        {isSaving ? "Saving..." : "Save"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </form>
           </Form>
         </div>
