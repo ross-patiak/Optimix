@@ -4,9 +4,14 @@ import { env } from "@/env";
 
 export default {
   schema: "./src/server/db/schema.ts",
-  driver: "pg",
+  dialect: "singlestore",
+  tablesFilter: ["mangomix_*"],
   dbCredentials: {
-    connectionString: env.POSTGRES_URL,
+    host: env.SINGLESTORE_HOST,
+    port: env.SINGLESTORE_PORT,
+    user: env.SINGLESTORE_USER,
+    password: env.SINGLESTORE_PASS,
+    database: env.SINGLESTORE_DB_NAME,
+    ssl: {},
   },
-  tablesFilter: ["optimix_*"],
 } satisfies Config;

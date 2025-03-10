@@ -1,6 +1,33 @@
-import { drizzle } from "drizzle-orm/vercel-postgres";
-import { sql } from "@vercel/postgres";
-import * as schema from "./schema";
+import { drizzle } from "drizzle-orm/singlestore";
+import { createPool, type Pool } from "mysql2/promise";
 
-// Use this object to send drizzle queries to your DB
-export const db = drizzle(sql, { schema });
+import { env } from "@/env";
+import * as schema from "@/server/db/schema";
+
+/**
+ * Cache the database connection in development. This avoids creating a new connection on every HMR
+ * update.
+ */
+const globalForDb = globalThis as unknown as {
+  conn: Pool | undefined;
+};
+
+const conn =
+  globalForDb.conn ??
+  createPool({
+    host: env.SINGLESTORE_HOST,
+    port: env.SINGLESTORE_PORT,
+    user: env.SINGLESTORE_USER,
+    password: env.SINGLESTORE_PASS,
+    database: env.SINGLESTORE_DB_NAME,
+    ssl: {},
+    maxIdle: 0,
+  });
+if (env.NODE_ENV !== "production") globalForDb.conn = conn;
+
+conn.addListener("error", (err) => {
+  console.error("Database connection error:", err);
+});
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+export const db = drizzle(conn, { schema });
