@@ -1,9 +1,10 @@
 "use server";
 import { currentUser, clerkClient, auth } from "@clerk/nextjs/server";
-import type { Mix } from "@/lib/types";
+import type { Mix, SavedMix } from "@/lib/types";
 import { db } from "@/server/db";
-import { users } from "@/server/db/schema";
-import { eq } from "drizzle-orm";
+import { users, savedMixes } from "@/server/db/schema";
+import { eq, desc } from "drizzle-orm";
+import { nanoid } from "nanoid";
 /*eslint-disable*/
 export const getUser = async () => {
   const { userId } = auth();
@@ -210,4 +211,54 @@ export const queueMix = async (mix: Mix): Promise<number> => {
   }
 
   return 404;
+};
+
+export const saveMix = async (mix: Mix & { name: string }): Promise<string> => {
+  try {
+    const { userId } = auth();
+
+    if (!userId) {
+      throw new Error("User not authenticated");
+    }
+
+    // Create a unique ID for the mix
+    const mixId = nanoid();
+
+    // Save the mix to the database
+    await db.insert(savedMixes).values({
+      id: mixId,
+      userId,
+      name: mix.name,
+      playlistRatios: mix.playlistRatios,
+      queueSize: mix.queueSize,
+      createdAt: Date.now(),
+    });
+
+    return mixId;
+  } catch (error) {
+    console.error("Error saving mix:", error);
+    throw error;
+  }
+};
+
+export const getUserMixes = async (): Promise<SavedMix[]> => {
+  try {
+    const { userId } = auth();
+
+    if (!userId) {
+      throw new Error("User not authenticated");
+    }
+
+    // Get the user's saved mixes
+    const mixes = await db
+      .select()
+      .from(savedMixes)
+      .where(eq(savedMixes.userId, userId))
+      .orderBy(desc(savedMixes.createdAt));
+
+    return mixes as SavedMix[];
+  } catch (error) {
+    console.error("Error getting user mixes:", error);
+    throw error;
+  }
 };

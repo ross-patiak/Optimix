@@ -11,3 +11,10 @@ export type Mix = {
   playlistRatios: Record<string, string>;
   queueSize: string;
 };
+
+export type SavedMix = Mix & {
+  id: string;
+  name: string;
+  userId: string;
+  createdAt: number;
+};
