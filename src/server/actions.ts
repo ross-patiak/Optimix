@@ -1,9 +1,12 @@
 "use server";
 import { currentUser, clerkClient, auth } from "@clerk/nextjs/server";
 import type { Mix } from "@/lib/types";
+import { db } from "@/server/db";
+import { users } from "@/server/db/schema";
+import { eq } from "drizzle-orm";
 /*eslint-disable*/
 export const getUser = async () => {
-  const { userId } = await auth();
+  const { userId } = auth();
 
   if (userId != null) {
     const clerkResponse = await clerkClient.users.getUserOauthAccessToken(
@@ -26,7 +29,39 @@ export const getUser = async () => {
       if (spotifyUser instanceof Response) {
         //eslint-disable-next-line
         data = await spotifyUser.json(); // or response.text(), response.blob(), etc.
-        // Continue processing the data...
+
+        // Save user to database if they don't exist
+        if (data && data.id) {
+          // Check if user exists by Clerk ID
+          const existingUser = await db
+            .select()
+            .from(users)
+            .where(eq(users.id, userId));
+
+          if (!existingUser.length) {
+            // User doesn't exist, create new user
+            await db.insert(users).values({
+              id: userId, // Use Clerk ID as primary key
+              spotifyId: data.id, // Store Spotify ID in spotifyId field
+              username: data.display_name || "",
+            });
+            console.log(
+              "New user created in database, ClerkID:",
+              userId,
+              "SpotifyID:",
+              data.id,
+            );
+          } else {
+            // User exists, update Spotify info if needed
+            await db
+              .update(users)
+              .set({
+                spotifyId: data.id,
+                username: data.display_name || "",
+              })
+              .where(eq(users.id, userId));
+          }
+        }
       } else {
         // Handle the case where the timeout expired
         console.log("Timeout expired");
