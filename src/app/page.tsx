@@ -1,10 +1,4 @@
-import {
-  SignInButton,
-  SignOutButton,
-  SignedIn,
-  SignedOut,
-} from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
 import type { Playlist } from "@/lib/types";
 import { getUser, getUserPlaylists } from "@/server/actions";
 import Mix from "@/components/ui/custom/Mix";
@@ -18,20 +12,17 @@ export default async function HomePage() {
   return (
     <div className="flex h-full flex-col">
       <header className="mb-8 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Optimix</h1>
+        <h1 className="text-3xl font-bold">MangoMix</h1>
         <ThemeSwitcher />
       </header>
 
       <SignedOut>
         <div className="flex flex-grow flex-col items-center justify-center gap-6 py-10 text-center">
-          <h2 className="text-3xl font-bold">Welcome to Optimix</h2>
+          <h2 className="text-3xl font-bold">Welcome to MangoMix</h2>
           <p className="mb-4 max-w-md text-lg">
             Create better playlists with smarter mixing options from your
             Spotify library
           </p>
-          <SignInButton>
-            <Button size="lg">Sign In with Spotify</Button>
-          </SignInButton>
         </div>
       </SignedOut>
 
@@ -43,12 +34,6 @@ export default async function HomePage() {
               <span className="font-semibold">{user?.display_name}</span>!
             </div>
           ) : null}
-
-          <SignOutButton>
-            <Button variant="neutral" size="sm">
-              Sign out
-            </Button>
-          </SignOutButton>
         </div>
 
         <div className="flex-grow">
