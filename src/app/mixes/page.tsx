@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { SignedIn } from "@clerk/nextjs";
 import { getUserMixes } from "@/server/actions";
 import Link from "next/link";

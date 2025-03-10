@@ -1,29 +1,101 @@
-# Create T3 App
+# MangoMix
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+MangoMix is a modern web application that helps you create better playlists with smarter mixing options from your Spotify library. It allows you to combine tracks from multiple playlists with customizable ratios, save your favorite mixes, and queue them directly to Spotify.
 
-## What's next? How do I make an app with this?
+## Features
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- **Smart Playlist Mixing**: Combine tracks from multiple playlists with customizable ratios
+- **Save Mixes**: Save your favorite mix configurations for later use
+- **Queue to Spotify**: Send your mixed playlists directly to your Spotify queue
+- **Spotify Integration**: Seamless connection with your Spotify account
+- **Responsive Design**: Works on desktop and mobile devices
+- **Dark Mode Support**: Toggle between light and dark themes
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Tech Stack
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+MangoMix is built with a modern tech stack:
 
-## Learn More
+- **Framework**: [Next.js 14](https://nextjs.org/) with App Router and Server Components
+- **Language**: [TypeScript](https://www.typescriptlang.org/) for type safety
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) with a Neobrutalism design aesthetic
+- **UI Components**: [shadcn/ui](https://ui.shadcn.com/) - A collection of reusable components
+- **Authentication**: [Clerk](https://clerk.com/) for user authentication and management
+- **Database**: [SingleStore](https://www.singlestore.com/) with [Drizzle ORM](https://orm.drizzle.team/)
+- **State Management**: [React Query](https://tanstack.com/query) for state management
+- **Form Handling**: [React Hook Form](https://react-hook-form.com/) with [Zod](https://zod.dev/) for validation
+- **Deployment**: Vercel (recommended)
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+## Getting Started
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+### Prerequisites
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+- Node.js 18+ and npm/yarn
+- A Spotify Developer account
+- A Clerk account
+- A SingleStore database
 
-## How do I deploy this?
+### Installation
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/yourusername/mangomix.git
+   cd mangomix
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. Copy the `.env.example` file to `.env.local` and fill in your environment variables:
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+4. Start the development server:
+
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+
+## Project Structure
+
+```
+mangomix/
+├── src/
+│   ├── app/                 # Next.js App Router pages
+│   │   ├── components/          # React components
+│   │   │   ├── ui/              # UI components from shadcn/ui
+│   │   │   └── ui/custom/       # Custom UI components
+│   │   ├── hooks/               # Custom React hooks
+│   │   ├── lib/                 # Utility functions and types
+│   │   ├── server/              # Server-side code
+│   │   │   ├── actions.ts       # Server actions
+│   │   │   └── db/              # Database schema and configuration
+│   │   └── styles/              # Global styles
+│   ├── public/                  # Static assets
+│   └── ...config files
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgements
+
+- [Spotify API](https://developer.spotify.com/documentation/web-api/) for providing the music data
+- [shadcn/ui](https://ui.shadcn.com/) for the beautiful UI components
+- [Neobrutalism design](https://github.com/ekmas/neobrutalism-components) for inspiration
