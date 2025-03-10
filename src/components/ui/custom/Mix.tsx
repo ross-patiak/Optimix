@@ -25,7 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { toast } from "@/hooks/use-toast";
-import { Trash2 } from "lucide-react";
+import { Trash2, Percent } from "lucide-react";
 import type { Playlist, Mix } from "@/lib/types";
 import { queueMix, saveMix } from "@/server/actions";
 import PlaylistSelect from "./PlaylistSelect";
@@ -158,33 +158,40 @@ const Mix = ({ data, userId }: MixProps) => {
   };
 
   return (
-    <div className="flex flex-col gap-5">
-      <PlaylistSelect
-        data={data}
-        userId={userId}
-        pickedLists={pickedLists as Playlist[]}
-        setPickedLists={setPickedLists}
-      />
-      {pickedLists.length != 0 ? (
-        <div className="flex flex-col">
+    <div className="flex flex-col gap-8">
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Create a Mix</h2>
+        <p className="text-muted-foreground">
+          Select playlists and customize their mix ratios to create your perfect
+          blend.
+        </p>
+        <PlaylistSelect
+          data={data}
+          userId={userId}
+          pickedLists={pickedLists as Playlist[]}
+          setPickedLists={setPickedLists}
+        />
+      </div>
+
+      {pickedLists.length > 0 && (
+        <div className="space-y-8">
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="w-2/3 space-y-6"
-            >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
                 name="queueSize"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Queue Size</FormLabel>
+                  <FormItem className="w-full max-w-[240px]">
+                    <FormLabel className="text-base font-semibold">
+                      Queue Size
+                    </FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a verified email to display" />
+                          <SelectValue placeholder="Select number of songs" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -199,91 +206,115 @@ const Mix = ({ data, userId }: MixProps) => {
                 )}
               />
 
-              <div className="text-lg font-bold">
-                Playlist Weights (ensure %'s sum up to 100) 👇
-              </div>
-              {pickedLists?.map((item: Playlist) => (
-                <div className="flex" key={item.id}>
-                  <Card className="grow basis-3/4">
-                    <CardHeader>
-                      <CardTitle>{`id: ${item.id}`}</CardTitle>
-                      <CardDescription>{item.name}</CardDescription>
-                    </CardHeader>
-                  </Card>
-
-                  <div className="basis-1/5">
-                    <FormField
-                      control={form.control}
-                      name={`playlistRatios.${item.id}%${item.tracks["total"]}`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>%</FormLabel>
-                          <FormControl>
-                            <Input
-                              inputMode="numeric"
-                              {...field}
-                              defaultValue={`${form.getValues(`playlistRatios.${item.id}%${item.tracks["total"]}`)}`}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+              <Card className="border-2">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center">
+                    <Percent className="mr-2 h-5 w-5" />
+                    <CardTitle className="text-lg">Playlist Weights</CardTitle>
+                    <span className="text-muted-foreground ml-2 text-sm">
+                      (ensure percentages sum to 100)
+                    </span>
                   </div>
+                </CardHeader>
+                <div className="px-6 pb-6">
+                  <div className="space-y-3">
+                    {pickedLists?.map((item: Playlist) => (
+                      <div className="flex items-center gap-4" key={item.id}>
+                        <div className="flex-grow">
+                          <h4 className="font-medium">{item.name}</h4>
+                          <p className="text-muted-foreground text-xs">
+                            ID: {item.id}
+                          </p>
+                        </div>
 
-                  <div className="basis-[5%] content-center">
-                    <Button
-                      variant="default"
-                      size="icon"
-                      onClick={() => {
-                        setPickedLists(
-                          pickedLists.filter(
-                            (playlist) => playlist?.id !== item.id,
-                          ),
-                        );
+                        <div className="w-32">
+                          <FormField
+                            control={form.control}
+                            name={`playlistRatios.${item.id}%${item.tracks["total"]}`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <div className="flex items-center">
+                                  <FormControl>
+                                    <Input
+                                      inputMode="numeric"
+                                      {...field}
+                                      className="text-center"
+                                      defaultValue={`${form.getValues(`playlistRatios.${item.id}%${item.tracks["total"]}`)}`}
+                                    />
+                                  </FormControl>
+                                  <span className="ml-2 text-lg">%</span>
+                                </div>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
 
-                        form.unregister(
-                          `playlistRatios.${item.id}%${item.tracks["total"]}`,
-                        );
-                      }}
-                    >
-                      <Trash2 />
-                    </Button>
+                        <Button
+                          variant="neutral"
+                          size="icon"
+                          className="shrink-0"
+                          onClick={() => {
+                            setPickedLists(
+                              pickedLists.filter(
+                                (playlist) => playlist?.id !== item.id,
+                              ),
+                            );
+                            form.unregister(
+                              `playlistRatios.${item.id}%${item.tracks["total"]}`,
+                            );
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
+              </Card>
 
               <div className="flex gap-4">
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="min-w-[120px]">
                   Queue Mix
                 </Button>
 
                 <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
                   <DialogTrigger asChild>
-                    <Button type="button" variant="default" className="w-full">
+                    <Button
+                      type="button"
+                      variant="neutral"
+                      className="min-w-[120px]"
+                    >
                       Save Mix
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="border-2 border-border">
                     <DialogHeader>
-                      <DialogTitle>Save Mix</DialogTitle>
+                      <DialogTitle className="text-xl">Save Mix</DialogTitle>
                     </DialogHeader>
                     <div className="py-4">
-                      <Label htmlFor="mix-name">Mix Name</Label>
+                      <Label
+                        htmlFor="mix-name"
+                        className="text-base font-medium"
+                      >
+                        Mix Name
+                      </Label>
                       <Input
                         id="mix-name"
                         value={mixName}
                         onChange={(e) => setMixName(e.target.value)}
                         placeholder="My Awesome Mix"
+                        className="mt-2"
                       />
                     </div>
-                    <DialogFooter>
+                    <DialogFooter className="gap-2">
                       <DialogClose asChild>
-                        <Button variant="default">Cancel</Button>
+                        <Button variant="neutral">Cancel</Button>
                       </DialogClose>
                       <Button
                         onClick={handleSaveMix}
                         disabled={isSaving || !mixName.trim()}
+                        className="min-w-24"
                       >
                         {isSaving ? "Saving..." : "Save"}
                       </Button>
@@ -294,7 +325,7 @@ const Mix = ({ data, userId }: MixProps) => {
             </form>
           </Form>
         </div>
-      ) : null}
+      )}
     </div>
   );
 };

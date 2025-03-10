@@ -77,17 +77,22 @@ const PlaylistSelect = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex max-w-xl items-end gap-4"
+      >
         <FormField
           control={form.control}
           name="playlist"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Playlist</FormLabel>
+            <FormItem className="flex-grow">
+              <FormLabel className="text-base font-semibold">
+                Add Playlist
+              </FormLabel>
               <Select onValueChange={field.onChange}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Add playlist to mix" />
+                    <SelectValue placeholder="Choose a playlist" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -131,7 +136,9 @@ const PlaylistSelect = ({
             </FormItem>
           )}
         />
-        <Button type="submit">Add</Button>
+        <Button type="submit" size="default">
+          Add to Mix
+        </Button>
       </form>
     </Form>
   );
